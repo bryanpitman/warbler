@@ -359,8 +359,13 @@ def homepage():
     """
 
     if g.user:
+        followed_users = [user.id for user in g.user.following] #list [] comprehension [90, 261]
+        ids_to_show = [*followed_users, g.user.id]
+        """g.users is logged in profile .following is our relation in the database (backref) list of user
+        that g.user is following. Iterating over the list and getting the ids"""
         messages = (Message
                     .query
+                    .filter(Message.user_id.in_(ids_to_show))
                     .order_by(Message.timestamp.desc())
                     .limit(100)
                     .all())
