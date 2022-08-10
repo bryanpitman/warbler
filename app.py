@@ -42,7 +42,7 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-        
+
     else:
         g.user = None
 
@@ -130,11 +130,9 @@ def logout():
     if form.validate_on_submit():
         do_logout()
         flash("Successfully logged out.")
-        return redirect("/")
+    return redirect("/")
 
-    else:
-        # didn't pass CSRF; ignore logout attempt
-        raise Unauthorized()
+
 
     # IMPLEMENT THIS AND FIX BUG
     # DO NOT CHANGE METHOD ON ROUTE
@@ -249,23 +247,25 @@ def profile():
     user = User.query.get(g.user.id)
     form = EditUserForm(obj=user)
 
-    if not form.validate_on_submit():
-        return render_template('/users/edit.html', form = form)
+    if form.validate_on_submit():
+        # return render_template('/users/edit.html', form = form)
 
-    user.username = form.username.data
-    user.email = form.email.data
-    user.image_url = form.image_url.data
-    user.header_image_url = form.header_image_url.data
-    user.bio = form.bio.data
-    password = form.password.data
 
-    if User.authenticate(g.user.username, password):
-        db.session.commit()
-        flash("Changes saved!")
-        return redirect(f"/users/{g.user.id}")
-    else:
-        form.password.errors = ["Invalid password."]
-        return render_template("users/edit.html", form=form)
+        user.username = form.username.data
+        user.email = form.email.data
+        user.image_url = form.image_url.data or None
+        user.header_image_url = form.header_image_url.data or None
+        user.bio = form.bio.data
+        password = form.password.data
+
+        if User.authenticate(g.user.username, password):
+            db.session.commit()
+            flash("Changes saved!")
+            return redirect(f"/users/{g.user.id}")
+        else:
+            form.password.errors = ["Invalid password."]
+
+    return render_template("users/edit.html", form=form)
 
 
 
@@ -281,10 +281,11 @@ def delete_user():
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    do_logout()
+    if g.csrf_form.validate_on_submit():
+        do_logout()
 
-    db.session.delete(g.user)
-    db.session.commit()
+        db.session.delete(g.user)
+        db.session.commit()
 
     return redirect("/signup")
 

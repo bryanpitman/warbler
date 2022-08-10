@@ -169,6 +169,8 @@ class Message(db.Model):
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
     )
+#users_liked and liked_messages
+    liked_by = db.relationship('User', secondary='likes', backref = 'likes')
 
 
 def connect_db(app):
@@ -179,3 +181,21 @@ def connect_db(app):
 
     db.app = app
     db.init_app(app)
+
+
+class Like(db.Model):
+    """Connection of a liked post to a user."""
+
+    __tablename__ = 'likes'
+
+    message_id = db.Column(
+        db.Integer,
+        db.ForeignKey('messages.id', ondelete="cascade"),
+        primary_key=True,
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+        primary_key=True,
+    )
