@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import Unauthorized
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, CsrfOnlyForm
 from models import db, connect_db, User, Message
 
 load_dotenv()
@@ -26,10 +27,14 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-
+#g is a server side session cookie
 ##############################################################################
 # User signup/login/logout
+@app.before_request
+def add_csrf_form_to_all_pages():
+    """Before every route, add CSRF-only form to global object."""
 
+    g.csrf_form = CsrfOnlyForm()
 
 @app.before_request
 def add_user_to_g():
@@ -50,6 +55,8 @@ def do_login(user):
 
 def do_logout():
     """Log out user."""
+
+
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
@@ -119,6 +126,14 @@ def logout():
     """Handle logout of user and redirect to homepage."""
 
     form = g.csrf_form
+
+    if form.validate_on_submit():
+        do_logout()
+        return redirect("/")
+
+    else:
+        # didn't pass CSRF; ignore logout attempt
+        raise Unauthorized()
 
     # IMPLEMENT THIS AND FIX BUG
     # DO NOT CHANGE METHOD ON ROUTE

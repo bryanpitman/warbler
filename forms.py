@@ -23,3 +23,10 @@ class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
+
+class CsrfOnlyForm(FlaskForm):
+    """For actions where we want CSRF protection, but don't need any fields.
+
+    Currently used for our "delete" buttons, which make POST requests, and the
+    logout button, which makes POST requests.
+    """
