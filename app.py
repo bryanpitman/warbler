@@ -42,7 +42,7 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
-
+        
     else:
         g.user = None
 
@@ -359,8 +359,8 @@ def homepage():
     """
 
     if g.user:
-        followed_users = [user.id for user in g.user.following] #list [] comprehension [90, 261]
-        ids_to_show = [*followed_users, g.user.id]
+        followed_users_id = [user.id for user in g.user.following] #list [] comprehension [90, 261]
+        ids_to_show = [*followed_users_id, g.user.id]
         """g.users is logged in profile .following is our relation in the database (backref) list of user
         that g.user is following. Iterating over the list and getting the ids"""
         messages = (Message
