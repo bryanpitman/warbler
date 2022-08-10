@@ -12,7 +12,7 @@ DEFAULT_IMAGE_URL = "/static/images/default-pic.png"
 DEFAULT_HEADER_IMAGE_URL = "/static/images/warbler-hero.jpg"
 
 
-class Follows(db.Model):
+class Follow(db.Model):
     """Connection of a follower <-> followed_user."""
 
     __tablename__ = 'follows'
@@ -80,8 +80,8 @@ class User(db.Model):
     followers = db.relationship(
         "User",
         secondary="follows",
-        primaryjoin=(Follows.user_being_followed_id == id),
-        secondaryjoin=(Follows.user_following_id == id),
+        primaryjoin=(Follow.user_being_followed_id == id),
+        secondaryjoin=(Follow.user_following_id == id),
         backref="following",
     )
 
