@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Unauthorized
 
 from forms import UserAddForm, LoginForm, MessageForm, CsrfOnlyForm, EditUserForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Like
 
 load_dotenv()
 
@@ -27,14 +27,17 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-#g is a server side session cookie
+# g is a server side session cookie
 ##############################################################################
 # User signup/login/logout
+
+
 @app.before_request
 def add_csrf_form_to_all_pages():
     """Before every route, add CSRF-only form to global object."""
 
     g.csrf_form = CsrfOnlyForm()
+
 
 @app.before_request
 def add_user_to_g():
@@ -55,8 +58,6 @@ def do_login(user):
 
 def do_logout():
     """Log out user."""
-
-
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
@@ -131,8 +132,6 @@ def logout():
         do_logout()
         flash("Successfully logged out.")
     return redirect("/")
-
-
 
     # IMPLEMENT THIS AND FIX BUG
     # DO NOT CHANGE METHOD ON ROUTE
@@ -250,7 +249,6 @@ def profile():
     if form.validate_on_submit():
         # return render_template('/users/edit.html', form = form)
 
-
         user.username = form.username.data
         user.email = form.email.data
         user.image_url = form.image_url.data or None
@@ -266,8 +264,6 @@ def profile():
             form.password.errors = ["Invalid password."]
 
     return render_template("users/edit.html", form=form)
-
-
 
 
 @app.post('/users/delete')
@@ -340,11 +336,33 @@ def delete_message(message_id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    msg = Message.query.get_or_404(message_id)
-    db.session.delete(msg)
-    db.session.commit()
+    if g.csrf_form.validate_on_submit():
+        msg = Message.query.get_or_404(message_id)
+        db.session.delete(msg)
+        db.session.commit()
 
     return redirect(f"/users/{g.user.id}")
+
+
+@app.post('/messages/<int:message_id>/like')
+def like_messages(message_id):
+    "Like a message"
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    msg = Message.query.get_or_404(message_id)
+
+    if g.csrf_form.validate_on_submit():
+        liked_message = Like(message_id = msg.id, user_id = g.user.id)
+        db.session.add(liked_message)
+        db.session.commit()
+        flash("Warble liked! Warb On!")
+
+    return redirect('/')
+
+
 
 
 ##############################################################################
