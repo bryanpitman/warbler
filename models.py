@@ -169,8 +169,10 @@ class Message(db.Model):
         db.ForeignKey('users.id', ondelete='CASCADE'),
         nullable=False,
     )
-#users_liked and liked_messages
-    liked_by = db.relationship('User', secondary='likes', backref = 'likes')
+
+    users_liked = db.relationship('User',
+                                  secondary='likes',
+                                  backref='liked_messages')
 
 
 def connect_db(app):
