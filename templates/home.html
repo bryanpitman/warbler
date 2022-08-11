@@ -54,13 +54,11 @@
             <a href="/users/{{ msg.user.id }}">@{{ msg.user.username }}</a>
             <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
             <p>{{ msg.text }}</p>
-            <!-- TODO: Fix so filled thumbs show on like and that you can't like
-            a post twice -->
             {% if not msg.user.id == g.user.id %}
             <form action="/messages/{{ msg.id }}/like" method="POST">
               {{ g.csrf_form.hidden_tag() }}
                <button class="btn btn-link">
-                {% if g.user.id in msg.users_liked.id %}
+                {% if msg in g.user.liked_messages %}
                 <i class="bi bi-hand-thumbs-up-fill"></i>
                 {% else %}
                  <i class="bi bi-hand-thumbs-up"></i>
