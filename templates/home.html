@@ -55,16 +55,23 @@
             <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
             <p>{{ msg.text }}</p>
             {% if not msg.user.id == g.user.id %}
+
             <form action="/messages/{{ msg.id }}/like" method="POST">
               {{ g.csrf_form.hidden_tag() }}
-               <button class="btn btn-link">
-                {% if msg in g.user.liked_messages %}
+
+              {% if msg in g.user.liked_messages %}
+              <button class="btn btn-link" formaction="/messages/{{ msg.id }}/unlike">
                 <i class="bi bi-hand-thumbs-up-fill"></i>
-                {% else %}
-                 <i class="bi bi-hand-thumbs-up"></i>
-                {% endif %}
               </button>
-             </form>
+
+              {% else %}
+              <button class="btn btn-link" formaction="/messages/{{ msg.id }}/like">
+                <i class="bi bi-hand-thumbs-up"></i>
+              </button>
+
+              {% endif %}
+
+            </form>
             {% endif %}
           </div>
       </li>

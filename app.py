@@ -363,7 +363,23 @@ def like_messages(message_id):
     return redirect('/')
 
 
+@app.post('/messages/<int:message_id>/unlike')
+def unlike_messages(message_id):
+    "remove like from message"
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    msg = Message.query.get_or_404(message_id)
+
+    if g.csrf_form.validate_on_submit():
+        liked_message = Like.query.get((msg.id, g.user.id))
+        db.session.delete(liked_message)
+        db.session.commit()
+        flash("Warble unliked! Warb OFF!")
+
+    return redirect('/')
 
 ##############################################################################
 # Homepage and error pages
