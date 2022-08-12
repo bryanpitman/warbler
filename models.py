@@ -170,6 +170,12 @@ class Message(db.Model):
         nullable=False,
     )
 
+    def is_owner(self, user):
+        """Is this message written by the user"""
+        if self.user_id == user.id:
+            return True
+        return False
+
     users_liked = db.relationship('User',
                                   secondary='likes',
                                   backref='liked_messages')
@@ -186,7 +192,7 @@ def connect_db(app):
 
 
 class Like(db.Model):
-    """Connection of a liked post to a user."""
+    """Connection of a liked message to a user."""
 
     __tablename__ = 'likes'
 
