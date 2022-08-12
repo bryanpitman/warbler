@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from models import db, User, Message, Follow
 
-from sqlalchemy.exc import NotNullViolation, IntegrityError
+#from sqlalchemy.exc import NotNullViolation, IntegrityError
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -94,6 +94,24 @@ class UserModelTestCase(TestCase):
 
     # Does User.signup successfully create a new user given valid credentials?
     def test_user_signup(self):
+
+        u1 = User.query.get(self.u1_id)
+
+        self.assertEqual(u1.username, "u1")
+        self.assertEqual(u1.email, "u1@email.com")
+        self.assertIn("$2b$12$", u1.password)
+
+
+    def test_user_auth(self):
+        """Test user authentication"""
+        u1 = User.query.get(self.u1_id)
+        fail_auth = User.authenticate("u1", "123456") #returns false
+        pass_auth = User.authenticate("u1", "password") #returns user
+        bad_name = User.authenticate("badname", "password") #return false
+
+        self.assertIs(pass_auth, u1)
+        self.assertFalse(fail_auth)
+        self.assertFalse(bad_name)
 
 
 
