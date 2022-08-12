@@ -365,8 +365,9 @@ def like_messages(message_id):
 
     msg = Message.query.get_or_404(message_id)
 
-    if g.csrf_form.validate_on_submit():
+    if g.csrf_form.validate_on_submit() and not msg.is_owner(g.user):
         liked_message = Like(message_id = msg.id, user_id = g.user.id)
+        #user relationship and append
         db.session.add(liked_message)
         db.session.commit()
         flash("Warble liked! Warb On!")
@@ -386,6 +387,7 @@ def unlike_messages(message_id):
 
     if g.csrf_form.validate_on_submit():
         liked_message = Like.query.get((msg.id, g.user.id))
+        #use relationship and delete
         db.session.delete(liked_message)
         db.session.commit()
         flash("Warble unliked! Warb OFF!")
