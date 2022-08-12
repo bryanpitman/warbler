@@ -91,3 +91,13 @@ class MessageModelTestCase(TestCase):
         u1 = User.query.get(self.u1_id)
         self.assertEqual(len(u1.messages), 1)
         self.assertEqual(m1.user, u1)
+
+    def test_is_owner(self):
+        """Test is_owner function works correctly"""
+
+        m1 = Message.query.get(self.m1_id)
+        u1 = User.query.get(self.u1_id)
+        u2 = User.query.get(self.u2_id)
+
+        self.assertTrue(m1.is_owner(u1))
+        self.assertFalse(m1.is_owner(u2))
