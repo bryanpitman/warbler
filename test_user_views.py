@@ -4,7 +4,7 @@
 #
 #    FLASK_ENV=production python -m unittest test_message_views.py
 
-
+import pdb
 import os
 from unittest import TestCase
 
@@ -77,3 +77,26 @@ class UserAddViewTestCase(UserBaseViewTestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('Log Out', html)
+
+
+# When you’re logged in, can you see the follower / following pages for any user?
+
+    def test_login_can_see_follower(self):
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+            u1 = User.query.get(self.u1_id)
+            u2 = User.query.get(self.u2_id)
+            u1.following.append(u2)
+
+            resp = c.get(f'/users/{self.u2_id}/followers', follow_redirects = True)
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+
+            self.assertIn('<p>@u1</p>', html)
+
+
+
+
