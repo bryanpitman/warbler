@@ -10,7 +10,8 @@ from unittest import TestCase
 
 from models import db, User, Message, Follow
 
-#from sqlalchemy.exc import NotNullViolation, IntegrityError
+from sqlalchemy.exc import IntegrityError
+# from psycopg2.errors import NotNullViolation
 
 # BEFORE we import our app, let's set an environmental variable
 # to use a different database for tests (we need to do this
@@ -115,10 +116,11 @@ class UserModelTestCase(TestCase):
 
 
 
-    #     # TODO: friday research assert raises(NotNullViolation)
-    # def test_user_signup_not_valid(self):
+    #    friday research assert raises(NotNullViolation)
+    def test_user_signup_not_valid(self):
+        # with is a keyword that handles errors
 
-    #     u3 = User.signup("u3", None, "password", None)
-    #     db.session.commit()
-    #     # operater with how to handle an error
+        with self.assertRaises(IntegrityError):
+            u3 = User.signup("u3", None, "password", None)
+            db.session.commit()
 

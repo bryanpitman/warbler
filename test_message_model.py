@@ -70,12 +70,24 @@ class MessageModelTestCase(TestCase):
         self.assertIsNotNone(m1.timestamp)
         self.assertEqual(m1.user_id, self.u1_id)
 
-    def test_liked_by(self):
+    def test_liked_relationship(self):
         """Test if liked by relationship works"""
 
-    def test_liked_messages(self):
-        """Test if liked messages relationship works"""
+        m1 = Message.query.get(self.m1_id)
+        u1 = User.query.get(self.u1_id)
+        u2 = User.query.get(self.u2_id)
+        m1.users_liked.append(u1)
 
-    def test_user_messages(self)
+        liked_msg = Like.query.get((self.m1_id, self.u1_id))
+
+        self.assertIsInstance(liked_msg, Like)
+        self.assertEqual(len(u1.liked_messages), 1)
+
+
+    def test_user_messages(self):
         """Test if user messages show on call"""
 
+        m1 = Message.query.get(self.m1_id)
+        u1 = User.query.get(self.u1_id)
+        self.assertEqual(len(u1.messages), 1)
+        self.assertEqual(m1.user, u1)
